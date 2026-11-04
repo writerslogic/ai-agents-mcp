@@ -6,14 +6,14 @@ The server is a thin client: it fetches the hub catalog, registers a tool per ag
 
 ## Install
 
-Requires Node.js 20 or later. No global install is needed; MCP clients run it with `npx`.
+Requires Node.js 20 or later. No global install is needed; MCP clients run it with `npx`, which builds it from this repository on first run.
 
 ```json
 {
   "mcpServers": {
     "writerslogic-ai-agents": {
       "command": "npx",
-      "args": ["-y", "@writerslogic/ai-agents-mcp"],
+      "args": ["-y", "github:writerslogic/ai-agents-mcp"],
       "env": {
         "AGENT_PRIVATE_KEY": "0x...",
         "MAX_USDC_PER_CALL": "1.00"
@@ -31,7 +31,7 @@ Put that block in your client's MCP configuration:
 | Cursor | `~/.cursor/mcp.json` (or `.cursor/mcp.json` in a project) |
 | Windsurf | `~/.codeium/windsurf/mcp_config.json` |
 | Cline | `cline_mcp_settings.json` (MCP Servers, Configure MCP Servers) |
-| Claude Code | `claude mcp add writerslogic-ai-agents -e AGENT_PRIVATE_KEY=0x... -- npx -y @writerslogic/ai-agents-mcp` |
+| Claude Code | `claude mcp add writerslogic-ai-agents -e AGENT_PRIVATE_KEY=0x... -- npx -y github:writerslogic/ai-agents-mcp` |
 
 Omit `AGENT_PRIVATE_KEY` to browse and to see prices: paid tools then return the payment instructions instead of paying.
 
