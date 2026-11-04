@@ -72,6 +72,18 @@ export async function startMockHub(routes: Route[]): Promise<MockHub> {
           ],
         });
       }
+      const sized = /^\/size\/(\d+)(\/chunked)?$/.exec(path);
+      if (sized) {
+        const body = "x".repeat(Number(sized[1]));
+        if (sized[2]) {
+          res.writeHead(200, { "content-type": "text/plain" });
+          res.write(body.slice(0, body.length / 2));
+          return res.end(body.slice(body.length / 2));
+        }
+        res.writeHead(200, { "content-type": "text/plain", "content-length": String(body.length) });
+        return res.end(body);
+      }
+      if (path === "/hang") return;
       if (req.method === "POST" && path === "/api/v1/verify-provenance") return json(200, { valid: true });
 
       const route = byPath.get(path);

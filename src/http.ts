@@ -22,7 +22,7 @@ async function readCapped(res: Response, limit: number): Promise<string> {
   for await (const chunk of res.body as unknown as AsyncIterable<Uint8Array>) {
     total += chunk.byteLength;
     if (total > limit) {
-      await res.body.cancel();
+      // Leaving the loop cancels the stream; cancel() here would reject because the iterator holds the lock.
       throw new HttpFailure(`Response exceeds the ${limit} byte limit`);
     }
     chunks.push(chunk);
