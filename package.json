@@ -1,0 +1,48 @@
+{
+  "name": "@writerslogic/ai-agents-mcp",
+  "version": "0.1.0",
+  "description": "MCP client for the WritersLogic x402 agent hub: pay-per-call AI agents settled in USDC on Base.",
+  "mcpName": "io.github.writerslogic/ai-agents-mcp",
+  "type": "module",
+  "license": "Apache-2.0",
+  "author": "WritersLogic",
+  "homepage": "https://github.com/writerslogic/ai-agents-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/writerslogic/ai-agents-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/writerslogic/ai-agents-mcp/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "x402",
+    "usdc",
+    "base",
+    "ai-agents",
+    "payments"
+  ],
+  "bin": {
+    "writerslogic-ai-agents-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepare": "npm run build",
+    "test": "npm run build && tsc -p tsconfig.test.json && node --test .build-test/test/*.test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "ethers": "^6.17.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "typescript": "^7.0.2"
+  }
+}

@@ -1,0 +1,82 @@
+import { Wallet, formatUnits, parseUnits } from "ethers";
+
+export const DEFAULT_BASE_URL = "https://agents.writerslogic.com";
+export const USDC_DECIMALS = 6;
+
+export interface Config {
+  /** Origin plus optional path prefix, no trailing slash. */
+  baseUrl: string;
+  wallet?: Wallet;
+  /** Per-call spending cap in USDC base units. */
+  maxPerCall: bigint;
+  /** Display form of the cap, as the user wrote it. */
+  maxPerCallUsdc: string;
+  apiKey?: string;
+  catalogTimeoutMs: number;
+  callTimeoutMs: number;
+}
+
+/** Base units to a display string with at least two decimals, e.g. 2000000 -> "2.00". */
+export function formatUsdc(atomic: bigint | string): string {
+  const s = formatUnits(atomic, USDC_DECIMALS);
+  return /\.\d$/.test(s) ? `${s}0` : s;
+}
+
+export class ConfigError extends Error {}
+
+const LOOPBACK = new Set(["localhost", "127.0.0.1", "[::1]"]);
+const USDC_AMOUNT_RE = /^\d{1,12}(\.\d{1,6})?$/;
+const PRIVATE_KEY_RE = /^(0x)?[0-9a-fA-F]{64}$/;
+
+export function parseBaseUrl(raw: string): string {
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    throw new ConfigError("AGENTS_BASE_URL is not a valid URL");
+  }
+  const secure = url.protocol === "https:";
+  if (!secure && !(url.protocol === "http:" && LOOPBACK.has(url.hostname))) {
+    throw new ConfigError("AGENTS_BASE_URL must use https (http is allowed only for localhost)");
+  }
+  if (url.username || url.password || url.search || url.hash) {
+    throw new ConfigError("AGENTS_BASE_URL must not contain credentials, a query string or a fragment");
+  }
+  return (url.origin + url.pathname).replace(/\/+$/, "");
+}
+
+export function parseUsdc(raw: string, name: string): bigint {
+  const value = raw.trim();
+  if (!USDC_AMOUNT_RE.test(value)) throw new ConfigError(`${name} must be a decimal USDC amount such as "1.00"`);
+  return parseUnits(value, USDC_DECIMALS);
+}
+
+function parseTimeout(raw: string | undefined, fallback: number): number {
+  if (raw === undefined || raw.trim() === "") return fallback;
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 1000 || n > 600_000) {
+    throw new ConfigError("AGENTS_TIMEOUT_MS must be an integer between 1000 and 600000");
+  }
+  return n;
+}
+
+export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
+  const maxPerCallUsdc = env.MAX_USDC_PER_CALL?.trim() || "1.00";
+  const key = env.AGENT_PRIVATE_KEY?.trim();
+  let wallet: Wallet | undefined;
+  if (key) {
+    // Never echo the key or the underlying parse error.
+    if (!PRIVATE_KEY_RE.test(key)) throw new ConfigError("AGENT_PRIVATE_KEY must be a 32-byte hex private key");
+    wallet = new Wallet(key.startsWith("0x") ? key : `0x${key}`);
+  }
+  const callTimeoutMs = parseTimeout(env.AGENTS_TIMEOUT_MS, 120_000);
+  return {
+    baseUrl: parseBaseUrl(env.AGENTS_BASE_URL?.trim() || DEFAULT_BASE_URL),
+    wallet,
+    maxPerCall: parseUsdc(maxPerCallUsdc, "MAX_USDC_PER_CALL"),
+    maxPerCallUsdc,
+    apiKey: env.AGENTS_API_KEY?.trim() || undefined,
+    catalogTimeoutMs: Math.min(15_000, callTimeoutMs),
+    callTimeoutMs,
+  };
+}

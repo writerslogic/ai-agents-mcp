@@ -1,0 +1,50 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.writerslogic/ai-agents-mcp",
+  "title": "WritersLogic AI Agents (x402)",
+  "description": "Pay-per-call AI agents over x402. Settled in USDC on Base with a per-call spending cap.",
+  "websiteUrl": "https://agents.writerslogic.com",
+  "repository": {
+    "url": "https://github.com/writerslogic/ai-agents-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@writerslogic/ai-agents-mcp",
+      "version": "0.1.0",
+      "runtimeHint": "npx",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "AGENT_PRIVATE_KEY",
+          "description": "Private key of a dedicated, low-balance wallet holding USDC on Base. Signs gasless EIP-3009 payment authorizations. Without it, paid tools return payment instructions instead of paying.",
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "MAX_USDC_PER_CALL",
+          "description": "Maximum USDC the client will authorize for a single tool call. Calls priced above it are refused.",
+          "isRequired": false,
+          "default": "1.00"
+        },
+        {
+          "name": "AGENTS_API_KEY",
+          "description": "Hub API key sent as X-API-KEY. Bypasses payment.",
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "AGENTS_BASE_URL",
+          "description": "Hub base URL (https only; http allowed for localhost).",
+          "isRequired": false,
+          "default": "https://agents.writerslogic.com"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      agentPrivateKey:
+        type: string
+        description: "Private key of a dedicated, low-balance wallet holding USDC on Base. Optional; without it paid tools return payment instructions."
+      maxUsdcPerCall:
+        type: string
+        default: "1.00"
+        description: "Maximum USDC authorized for a single tool call."
+      agentsApiKey:
+        type: string
+        description: "Optional hub API key (sent as X-API-KEY, bypasses payment)."
+      agentsBaseUrl:
+        type: string
+        default: "https://agents.writerslogic.com"
+        description: "Hub base URL."
+  commandFunction: |-
+    config => ({
+      command: 'npx',
+      args: ['-y', '@writerslogic/ai-agents-mcp'],
+      env: {
+        ...(config.agentPrivateKey ? { AGENT_PRIVATE_KEY: config.agentPrivateKey } : {}),
+        ...(config.agentsApiKey ? { AGENTS_API_KEY: config.agentsApiKey } : {}),
+        MAX_USDC_PER_CALL: config.maxUsdcPerCall,
+        AGENTS_BASE_URL: config.agentsBaseUrl
+      }
+    })
