@@ -14,6 +14,8 @@ export interface Config {
   apiKey?: string;
   catalogTimeoutMs: number;
   callTimeoutMs: number;
+  /** Packages whose checks are listed as individual tools instead of one package tool. */
+  expandPackages: "all" | ReadonlySet<string>;
 }
 
 /** Base units to a display string with at least two decimals, e.g. 2000000 -> "2.00". */
@@ -60,6 +62,19 @@ function parseTimeout(raw: string | undefined, fallback: number): number {
   return n;
 }
 
+/** Agent and package ids as the hub publishes them. */
+export const ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
+
+export function parseExpandPackages(raw: string | undefined): "all" | ReadonlySet<string> {
+  const value = raw?.trim() ?? "";
+  if (value === "all") return "all";
+  const ids = value.split(",").map((s) => s.trim()).filter(Boolean);
+  for (const id of ids) {
+    if (!ID_RE.test(id)) throw new ConfigError('AGENTS_PACKAGES must be "all" or a comma-separated list of package ids');
+  }
+  return new Set(ids);
+}
+
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const maxPerCallUsdc = env.MAX_USDC_PER_CALL?.trim() || "1.00";
   const key = env.AGENT_PRIVATE_KEY?.trim();
@@ -78,5 +93,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     apiKey: env.AGENTS_API_KEY?.trim() || undefined,
     catalogTimeoutMs: Math.min(15_000, callTimeoutMs),
     callTimeoutMs,
+    expandPackages: parseExpandPackages(env.AGENTS_PACKAGES),
   };
 }

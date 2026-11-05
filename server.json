@@ -43,6 +43,11 @@
           "description": "Hub base URL (https only; http allowed for localhost).",
           "isRequired": false,
           "default": "https://agents.writerslogic.com"
+        },
+        {
+          "name": "AGENTS_PACKAGES",
+          "description": "\"all\" or a comma-separated list of package ids whose checks are listed as individual tools instead of one tool per package.",
+          "isRequired": false
         }
       ]
     }

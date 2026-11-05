@@ -44,10 +44,19 @@ Omit `AGENT_PRIVATE_KEY` to browse and to see prices: paid tools then return the
 | `AGENTS_API_KEY` | unset | Sent as `X-API-KEY`. Bypasses payment. |
 | `AGENTS_BASE_URL` | `https://agents.writerslogic.com` | Hub URL. Must be `https`; plain `http` is accepted for `localhost` only. |
 | `AGENTS_TIMEOUT_MS` | `120000` | Timeout for tool calls (1000 to 600000). The catalog fetch uses at most 15 s. |
+| `AGENTS_PACKAGES` | unset | `all`, or a comma-separated list of package ids, to list those packages' checks as individual tools instead of one tool per package. |
 
 ## Tools
 
-Tools are discovered from the hub catalog (`GET /api/v1/catalog`) when the server starts and refreshed on `tools/list` after ten minutes, so the live list is authoritative. Tool names are the agent id with every character outside `A-Za-z0-9_` replaced by `_`. Each tool takes the agent's own input schema. Agents at the time of writing:
+Tools are discovered from the hub catalog (`GET /api/v1/catalog?view=tools`) and package index (`GET /api/v1/packages`) when the server starts, and refreshed on `tools/list` after ten minutes, so the live list is authoritative. Tool names are the agent or package id with every character outside `A-Za-z0-9_` replaced by `_`. Each agent tool takes the agent's own input schema.
+
+Small single-purpose checks ($0.005 each) are grouped into one tool per package, such as `money_math_kit`, so the tool list stays short. A package tool takes one of:
+
+- `{"describe": true, "check": "<id>"}`: free. Returns the check's input schema and an example input, from `GET /api/v1/packages/<id>`. Without `check` it lists the package's checks.
+- `{"check": "<id>", "input": {...}}`: runs one check at its own price.
+- `{"calls": [{"check": "<id>", "input": {...}}, ...]}`: runs up to 20 checks from the package under one $0.02 payment through `/api/v1/micro-batch`. Stateful and network checks are rejected before payment.
+
+Arguments are validated locally first, so a check outside the package or a malformed call never reaches the hub. A hub without a package index gets one tool per agent. Agents at the time of writing:
 
 | Tool | Price (USDC) | Description |
 | --- | ---: | --- |

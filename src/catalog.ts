@@ -1,10 +1,10 @@
 import { parseUnits } from "ethers";
-import { USDC_DECIMALS } from "./config.js";
+import { ID_RE, USDC_DECIMALS } from "./config.js";
 import { MAX_CATALOG_BYTES, HttpFailure, request } from "./http.js";
 
-export const CATALOG_PATH = "/api/v1/catalog";
-const MAX_AGENTS = 200;
-const ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
+/** view=tools is the light catalog; hubs that predate it ignore the query and send the full manifest. */
+export const CATALOG_PATH = "/api/v1/catalog?view=tools";
+const MAX_ENTRIES = 2000;
 const PRICE_RE = /^\d{1,9}(\.\d{1,6})?$/;
 const MAX_TEXT = 4000;
 
@@ -20,9 +20,11 @@ export interface CatalogAgent {
   /** Price in USDC base units. */
   priceAtomic: bigint;
   inputSchema: JsonSchema;
+  /** Package id when the hub groups this agent into a package tool. */
+  package?: string;
 }
 
-const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
+export const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 
 /** Resolves a catalog path against the hub, refusing anything that would leave its origin. */
 export function resolveHubUrl(baseUrl: string, path: string): string | undefined {
@@ -55,6 +57,7 @@ export function parseAgent(raw: unknown, baseUrl: string): CatalogAgent | string
     priceUsdc,
     priceAtomic: parseUnits(priceUsdc, USDC_DECIMALS),
     inputSchema: toSchema(raw.inputSchema),
+    ...(typeof raw.package === "string" && ID_RE.test(raw.package) && { package: raw.package }),
   };
 }
 
@@ -76,7 +79,8 @@ export async function fetchCatalog(
 
   const agents: CatalogAgent[] = [];
   const seen = new Set<string>();
-  for (const raw of manifest.agents.slice(0, MAX_AGENTS)) {
+  if (manifest.agents.length > MAX_ENTRIES) warn(`catalog has ${manifest.agents.length} entries; using the first ${MAX_ENTRIES}`);
+  for (const raw of manifest.agents.slice(0, MAX_ENTRIES)) {
     const agent = parseAgent(raw, baseUrl);
     if (typeof agent === "string") {
       warn(`skipping catalog entry: ${agent}`);

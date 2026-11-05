@@ -17,6 +17,9 @@ startCommand:
         type: string
         default: "https://agents.writerslogic.com"
         description: "Hub base URL."
+      agentsPackages:
+        type: string
+        description: "Optional: all, or comma-separated package ids, to list their checks as individual tools."
   commandFunction: |-
     config => ({
       command: 'npx',
@@ -25,6 +28,7 @@ startCommand:
         ...(config.agentPrivateKey ? { AGENT_PRIVATE_KEY: config.agentPrivateKey } : {}),
         ...(config.agentsApiKey ? { AGENTS_API_KEY: config.agentsApiKey } : {}),
         MAX_USDC_PER_CALL: config.maxUsdcPerCall,
-        AGENTS_BASE_URL: config.agentsBaseUrl
+        AGENTS_BASE_URL: config.agentsBaseUrl,
+        ...(config.agentsPackages ? { AGENTS_PACKAGES: config.agentsPackages } : {})
       }
     })
