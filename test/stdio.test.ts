@@ -22,7 +22,7 @@ function connect(baseUrl: string, env: Record<string, string> = {}) {
   const transport = new StdioClientTransport({
     command: process.execPath,
     args: [entry],
-    env: { PATH: process.env.PATH ?? "", AGENTS_BASE_URL: baseUrl, ...env },
+    env: { PATH: process.env.PATH ?? "", AGENTS_BASE_URL: baseUrl, AGENTS_PROFILE: "all", ...env },
     stderr: "pipe",
   });
   return { client, transport, ready: client.connect(transport) };

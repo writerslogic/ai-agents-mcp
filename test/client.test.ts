@@ -37,7 +37,7 @@ let hub: MockHub;
 const logs: string[] = [];
 
 function configFor(env: Record<string, string> = {}) {
-  return loadConfig({ AGENTS_BASE_URL: hub.baseUrl, AGENT_PRIVATE_KEY: wallet.privateKey, MAX_USDC_PER_CALL: CAP, ...env });
+  return loadConfig({ AGENTS_BASE_URL: hub.baseUrl, AGENT_PRIVATE_KEY: wallet.privateKey, MAX_USDC_PER_CALL: CAP, AGENTS_PROFILE: "all", ...env });
 }
 
 async function call(name: string, env: Record<string, string> = {}) {
@@ -126,7 +126,7 @@ describe("exact payment", () => {
   });
 
   it("returns payment instructions without a key and sends nothing signed", async () => {
-    const cfg = loadConfig({ AGENTS_BASE_URL: hub.baseUrl });
+    const cfg = loadConfig({ AGENTS_BASE_URL: hub.baseUrl, AGENTS_PROFILE: "all" });
     const agent = (await fetchCatalog(cfg.baseUrl, 5000, () => {})).find((a) => a.id === "pay")!;
     const before = hub.posts("/api/v1/agents/pay").length;
     const out = await new HubClient(cfg).callAgent(agent, { q: "hi" });
@@ -194,5 +194,24 @@ describe("config", () => {
       assert.ok(e instanceof ConfigError);
       assert.ok(!e.message.includes(secret));
     }
+  });
+});
+
+describe("profile and tool names", () => {
+  it("defaults to the core set and rejects a malformed profile", () => {
+    const cfg = loadConfig({});
+    assert.notEqual(cfg.profile, "all");
+    assert.ok((cfg.profile as ReadonlySet<string>).has("web-search"));
+    assert.ok(!(cfg.profile as ReadonlySet<string>).has("causalReferee"));
+    assert.equal(loadConfig({ AGENTS_PROFILE: "all" }).profile, "all");
+    assert.deepEqual([...(loadConfig({ AGENTS_PROFILE: "a, causalReferee" }).profile as ReadonlySet<string>)], ["a", "causalReferee"]);
+    assert.throws(() => loadConfig({ AGENTS_PROFILE: "bad id" }), ConfigError);
+  });
+
+  it("names every tool in snake_case", async () => {
+    const { toolNameOf } = await import("../src/server.js");
+    assert.equal(toolNameOf("causalReferee"), "causal_referee");
+    assert.equal(toolNameOf("paperContradictions"), "paper_contradictions");
+    assert.equal(toolNameOf("web-search"), "web_search");
   });
 });

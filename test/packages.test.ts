@@ -21,7 +21,7 @@ const clients: Client[] = [];
 after(() => Promise.all(clients.map((c) => c.close())));
 
 async function serverFor(hub: MockHub, env: Record<string, string> = {}) {
-  const cfg = loadConfig({ AGENTS_BASE_URL: hub.baseUrl, AGENT_PRIVATE_KEY: wallet.privateKey, ...env });
+  const cfg = loadConfig({ AGENTS_BASE_URL: hub.baseUrl, AGENT_PRIVATE_KEY: wallet.privateKey, AGENTS_PROFILE: "all", ...env });
   const logs: string[] = [];
   const { server } = createServer(cfg, (m) => logs.push(m), "0.0.0");
   const [clientSide, serverSide] = InMemoryTransport.createLinkedPair();

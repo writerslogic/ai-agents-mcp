@@ -12,7 +12,9 @@ const MAX_TOOLS = 1000;
 
 type Entry = { kind: "agent"; agent: CatalogAgent } | { kind: "package"; pkg: PackageTool };
 
-export const toolNameOf = (agentId: string) => agentId.replace(/[^A-Za-z0-9_]/g, "_").slice(0, 64);
+/** snake_case for every tool: camelCase ids such as causalReferee become causal_referee, other characters become underscores. */
+export const toolNameOf = (agentId: string) =>
+  agentId.replace(/([a-z0-9])([A-Z])/g, "$1_$2").replace(/[^A-Za-z0-9_]/g, "_").toLowerCase().slice(0, 64);
 
 const VERIFY_DESCRIPTION =
   "Free. Verify the provenance record (_provenance) the WritersLogic agent hub attaches to every paid result. " +
@@ -91,7 +93,9 @@ export class ToolRegistry {
     const batch = index?.batchId ? agents.find((a) => a.id === index.batchId) : undefined;
     const singles: CatalogAgent[] = [];
     const packages = new Map<string, PackageTool>();
+    const profile = this.cfg.profile;
     for (const agent of agents) {
+      if (profile !== "all" && !profile.has(agent.id) && !(agent.package && profile.has(agent.package))) continue;
       const meta = agent.package ? index?.packages.get(agent.package) : undefined;
       if (!meta || expanded(meta.id)) {
         singles.push(agent);

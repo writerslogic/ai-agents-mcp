@@ -17,6 +17,10 @@ startCommand:
         type: string
         default: "https://agents.writerslogic.com"
         description: "Hub base URL."
+      agentsProfile:
+        type: string
+        default: "core"
+        description: "core (14 web, document and code-security tools), all, or comma-separated agent or package ids."
       agentsPackages:
         type: string
         description: "Optional: all, or comma-separated package ids, to list their checks as individual tools."
@@ -27,6 +31,7 @@ startCommand:
       env: {
         ...(config.agentPrivateKey ? { AGENT_PRIVATE_KEY: config.agentPrivateKey } : {}),
         ...(config.agentsApiKey ? { AGENTS_API_KEY: config.agentsApiKey } : {}),
+        AGENTS_PROFILE: config.agentsProfile,
         MAX_USDC_PER_CALL: config.maxUsdcPerCall,
         AGENTS_BASE_URL: config.agentsBaseUrl,
         ...(config.agentsPackages ? { AGENTS_PACKAGES: config.agentsPackages } : {})

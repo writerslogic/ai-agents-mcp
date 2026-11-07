@@ -1,6 +1,6 @@
 # @writerslogic/ai-agents-mcp
 
-An MCP server that exposes the [WritersLogic x402 agent hub](https://agents.writerslogic.com) as tools. Each hub agent becomes one tool. Calls are priced in USDC and paid over [x402](https://github.com/coinbase/x402) on Base, with no gas needed from the buyer.
+An MCP server that exposes the [WritersLogic x402 agent hub](https://agents.writerslogic.com) as tools. By default it lists a focused set of 14 web, document and code-security tools (web search, page and PDF to markdown, page capture, transcription, PII redaction, company and lead research, pre-merge and dependency review, EU CRA checks). Set `AGENTS_PROFILE` to list more. Calls are priced in USDC and paid over [x402](https://github.com/coinbase/x402) on Base, with no gas needed from the buyer.
 
 The server is a thin client: it fetches the hub catalog, registers a tool per agent, forwards calls over HTTPS, and signs a payment authorization when the hub asks for one and your spending cap allows it.
 
@@ -44,6 +44,7 @@ Omit `AGENT_PRIVATE_KEY` to browse and to see prices: paid tools then return the
 | `AGENTS_API_KEY` | unset | Sent as `X-API-KEY`. Bypasses payment. |
 | `AGENTS_BASE_URL` | `https://agents.writerslogic.com` | Hub URL. Must be `https`; plain `http` is accepted for `localhost` only. |
 | `AGENTS_TIMEOUT_MS` | `120000` | Timeout for tool calls (1000 to 600000). The catalog fetch uses at most 15 s. |
+| `AGENTS_PROFILE` | `core` | Which hub agents become tools: `core` (the default set above), `all` (the whole hub, 80+ tools), or a comma-separated list of agent or package ids. |
 | `AGENTS_PACKAGES` | unset | `all`, or a comma-separated list of package ids, to list those packages' checks as individual tools instead of one tool per package. |
 
 ## Tools

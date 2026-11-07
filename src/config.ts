@@ -16,7 +16,20 @@ export interface Config {
   callTimeoutMs: number;
   /** Packages whose checks are listed as individual tools instead of one package tool. */
   expandPackages: "all" | ReadonlySet<string>;
+  /** Which hub agents become tools: "all", or the set of agent and package ids. Unset means the core web, document and code-security set. */
+  profile: "all" | ReadonlySet<string>;
 }
+
+/**
+ * The default tool set: web, document and code-security tools an assistant uses day to day. The hub lists far more agents
+ * (research, legal, crypto, micro-check packages); a client that lists all of them overloads the model's tool choice, so those
+ * are opted into with AGENTS_PROFILE.
+ */
+export const CORE_AGENTS: readonly string[] = [
+  "web-search", "page-contents", "page-capture", "doc-to-markdown", "transcribe-url", "redact-text", "company-identity",
+  "lead-enrichment", "competitor-battlecard", "pre-merge-review", "unicode-safety-gate", "dependency-advisor", "cra-readiness",
+  "cra-exploit-clock",
+];
 
 /** Base units to a display string with at least two decimals, e.g. 2000000 -> "2.00". */
 export function formatUsdc(atomic: bigint | string): string {
@@ -75,6 +88,17 @@ export function parseExpandPackages(raw: string | undefined): "all" | ReadonlySe
   return new Set(ids);
 }
 
+export function parseProfile(raw: string | undefined): "all" | ReadonlySet<string> {
+  const value = raw?.trim() ?? "";
+  if (value === "all") return "all";
+  if (value === "" || value === "core") return new Set(CORE_AGENTS);
+  const ids = value.split(",").map((s) => s.trim()).filter(Boolean);
+  for (const id of ids) {
+    if (!ID_RE.test(id)) throw new ConfigError('AGENTS_PROFILE must be "core", "all" or a comma-separated list of agent or package ids');
+  }
+  return new Set(ids);
+}
+
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const maxPerCallUsdc = env.MAX_USDC_PER_CALL?.trim() || "1.00";
   const key = env.AGENT_PRIVATE_KEY?.trim();
@@ -94,5 +118,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     catalogTimeoutMs: Math.min(15_000, callTimeoutMs),
     callTimeoutMs,
     expandPackages: parseExpandPackages(env.AGENTS_PACKAGES),
+    profile: parseProfile(env.AGENTS_PROFILE),
   };
 }
