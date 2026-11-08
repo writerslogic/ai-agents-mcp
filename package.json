@@ -1,6 +1,6 @@
 {
   "name": "@writerslogic/ai-agents-mcp",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "MCP client for the WritersLogic x402 agent hub: pay-per-call AI agents settled in USDC on Base.",
   "mcpName": "io.github.writerslogic/ai-agents-mcp",
   "type": "module",

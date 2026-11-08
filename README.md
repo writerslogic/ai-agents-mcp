@@ -1,6 +1,6 @@
 # @writerslogic/ai-agents-mcp
 
-An MCP server that exposes the [WritersLogic x402 agent hub](https://agents.writerslogic.com) as tools. By default it lists a focused set of 14 web, document and code-security tools (web search, page and PDF to markdown, page capture, transcription, PII redaction, company and lead research, pre-merge and dependency review, EU CRA checks). Set `AGENTS_PROFILE` to list more. Calls are priced in USDC and paid over [x402](https://github.com/coinbase/x402) on Base, with no gas needed from the buyer.
+An MCP server that exposes the [WritersLogic x402 agent hub](https://agents.writerslogic.com) as tools. By default it lists a focused set of 11 web, document and code-review tools (web search, page and PDF to markdown, page capture, transcription, PII redaction, company and lead research, pre-merge review, EU CRA readiness). Set `AGENTS_PROFILE` to list more. Calls are priced in USDC and paid over [x402](https://github.com/coinbase/x402) on Base, with no gas needed from the buyer.
 
 The server is a thin client: it fetches the hub catalog, registers a tool per agent, forwards calls over HTTPS, and signs a payment authorization when the hub asks for one and your spending cap allows it.
 
@@ -60,31 +60,18 @@ Small single-purpose checks ($0.005 each) are grouped into one tool per package,
 Arguments are validated locally first, so a check outside the package or a malformed call never reaches the hub. A hub without a package index gets one tool per agent. Agents at the time of writing:
 
 | Tool | Price (USDC) | Description |
-| --- | ---: | --- |
-| `abandoned_compound_miner` | 2.00 | Abandoned Compound & Uncommercialized Trial Miner |
-| `accessibility_patcher` | 0.75 | ADA / WCAG Lawsuit Shield & DOM Auto-Patcher |
-| `arxiv_to_code` | 1.00 | arXiv-to-Production Code & Hyperparameter Compiler |
-| `token_trap_detector` | 0.25 | On-Chain Bytecode & Unverified Token Trap Detector |
-| `chargeback_fighter` | 2.50 | E-Commerce Chargeback Representment Builder |
-| `clarification_impact` | 0.50 | Prediction-Market Clarification Impact Pricer |
-| `competitor_battlecard` | 1.50 | SaaS Pricing & Competitor Battlecard Spy |
-| `contract_auditor` | 1.00 | Smart Contract Auditor |
-| `contract_terminator` | 1.00 | Dark Pattern Contract & Subscription Exit Lawyer |
-| `cover_claim` | 5.00 | DeFi Cover Claim Adjudicator |
-| `diff_gatekeeper` | 0.50 | PR / Dependency Breaking-Change & Exploit Gatekeeper |
-| `dispute_ev` | 0.50 | UMA Dispute EV Desk |
-| `foreignResearchScout` | 1.50 | Cross-Lingual Dark Science Arbitrage Scout |
-| `lead_enrichment` | 0.50 | Autonomous Lead Enrichment |
-| `market_predictor` | 0.10 | Prediction Market Analyzer |
-| `medical_bill_auditor` | 3.00 | Medical Bill Upcoding & Overcharge Slasher |
-| `milestone_verifier` | 2.00 | Grant Milestone Verifier with Signed Release Attestation |
-| `patent_design_around` | 2.00 | Patent Design-Around & Freedom-to-Operate Architect |
-| `prior_art_invalidator` | 2.50 | Global Prior-Art Patent Invalidator |
-| `replication_auditor` | 0.75 | Scientific Consensus & Replication Failure Auditor |
-| `arbitrage_lawyer` | 0.75 | Cross-Platform Arbitrage & Resolution Rules Lawyer |
-| `heal_scraper` | 0.40 | Self-Healing Scraper & DOM-to-JSON Compiler |
-| `tariff_engineer` | 1.50 | Global Customs & Tariff Engineering Optimizer |
-| `vault_exit_lawyer` | 0.25 | Vault Exit Lawyer |
+| --- | --- | --- |
+| `search_web` | 0.01 | Web search: licensed Exa/Brave results with snippets |
+| `read_page` | 0.01 | Page contents: URL to clean Markdown or text |
+| `capture_page` | 0.02 | Page capture: screenshot or PDF of a public URL |
+| `convert_document` | 0.02 | Document to Markdown with per-page hashes and offsets |
+| `transcribe_audio` | 0.25 | Transcribe an audio or video file URL (Whisper, timestamps, SRT, VTT) |
+| `redact_text` | 0.05 | Selective PII redaction with a self-check |
+| `lookup_company` | 0.05 | Company identity: name, domain, LEI, VAT, CIK or ticker to one verified legal entity |
+| `enrich_lead` | 0.50 | Autonomous Lead Enrichment |
+| `build_battlecard` | 1.50 | SaaS Pricing & Competitor Battlecard Spy |
+| `review_code_changes` | 0.60 | Pre-merge Review Pack |
+| `check_cra_readiness` | 2.40 | EU CRA Readiness Check |
 
 Also always available, and free:
 

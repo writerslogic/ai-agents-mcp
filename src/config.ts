@@ -27,9 +27,27 @@ export interface Config {
  */
 export const CORE_AGENTS: readonly string[] = [
   "web-search", "page-contents", "page-capture", "doc-to-markdown", "transcribe-url", "redact-text", "company-identity",
-  "lead-enrichment", "competitor-battlecard", "pre-merge-review", "unicode-safety-gate", "dependency-advisor", "cra-readiness",
-  "cra-exploit-clock",
+  "lead-enrichment", "competitor-battlecard", "pre-merge-review", "cra-readiness",
 ];
+
+/**
+ * Verb-first tool names for the core agents, so the default tool list follows one pattern. The composites already contain the
+ * narrower agents (pre-merge-review runs unicode-safety-gate; cra-readiness runs dependency-advisor and cra-exploit-clock), so
+ * those are not listed separately by default. Every other agent keeps its id as the tool name.
+ */
+export const TOOL_ALIASES: Readonly<Record<string, string>> = {
+  "web-search": "search_web",
+  "page-contents": "read_page",
+  "page-capture": "capture_page",
+  "doc-to-markdown": "convert_document",
+  "transcribe-url": "transcribe_audio",
+  "redact-text": "redact_text",
+  "company-identity": "lookup_company",
+  "lead-enrichment": "enrich_lead",
+  "competitor-battlecard": "build_battlecard",
+  "pre-merge-review": "review_code_changes",
+  "cra-readiness": "check_cra_readiness",
+};
 
 /** Base units to a display string with at least two decimals, e.g. 2000000 -> "2.00". */
 export function formatUsdc(atomic: bigint | string): string {

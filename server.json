@@ -8,13 +8,13 @@
     "url": "https://github.com/writerslogic/ai-agents-mcp",
     "source": "github"
   },
-  "version": "0.3.0",
+  "version": "0.4.0",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@writerslogic/ai-agents-mcp",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "runtimeHint": "npx",
       "transport": {
         "type": "stdio"
@@ -46,7 +46,7 @@
         },
         {
           "name": "AGENTS_PROFILE",
-          "description": "core (default: 14 web, document and code-security tools), all, or a comma-separated list of agent or package ids to list as tools.",
+          "description": "core (default: 11 web, document and code-review tools), all, or a comma-separated list of agent or package ids to list as tools.",
           "isRequired": false,
           "isSecret": false
         },

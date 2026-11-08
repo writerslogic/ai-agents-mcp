@@ -202,6 +202,7 @@ describe("profile and tool names", () => {
     const cfg = loadConfig({});
     assert.notEqual(cfg.profile, "all");
     assert.ok((cfg.profile as ReadonlySet<string>).has("web-search"));
+    assert.equal((cfg.profile as ReadonlySet<string>).size, 11);
     assert.ok(!(cfg.profile as ReadonlySet<string>).has("causalReferee"));
     assert.equal(loadConfig({ AGENTS_PROFILE: "all" }).profile, "all");
     assert.deepEqual([...(loadConfig({ AGENTS_PROFILE: "a, causalReferee" }).profile as ReadonlySet<string>)], ["a", "causalReferee"]);
@@ -212,6 +213,7 @@ describe("profile and tool names", () => {
     const { toolNameOf } = await import("../src/server.js");
     assert.equal(toolNameOf("causalReferee"), "causal_referee");
     assert.equal(toolNameOf("paperContradictions"), "paper_contradictions");
-    assert.equal(toolNameOf("web-search"), "web_search");
+    assert.equal(toolNameOf("web-search"), "search_web");
+    assert.equal(toolNameOf("token-trap-detector"), "token_trap_detector");
   });
 });

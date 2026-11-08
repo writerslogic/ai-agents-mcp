@@ -2,7 +2,7 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { CallToolRequestSchema, ListToolsRequestSchema, type Tool } from "@modelcontextprotocol/sdk/types.js";
 import { fetchCatalog, type CatalogAgent } from "./catalog.js";
 import { HubClient } from "./client.js";
-import type { Config } from "./config.js";
+import { TOOL_ALIASES, type Config } from "./config.js";
 import { describePackage, fetchPackages, packageToolDef, parsePackageArgs, type PackageIndex, type PackageTool } from "./packages.js";
 
 export const VERIFY_TOOL = "verify_provenance";
@@ -14,6 +14,7 @@ type Entry = { kind: "agent"; agent: CatalogAgent } | { kind: "package"; pkg: Pa
 
 /** snake_case for every tool: camelCase ids such as causalReferee become causal_referee, other characters become underscores. */
 export const toolNameOf = (agentId: string) =>
+  TOOL_ALIASES[agentId] ??
   agentId.replace(/([a-z0-9])([A-Z])/g, "$1_$2").replace(/[^A-Za-z0-9_]/g, "_").toLowerCase().slice(0, 64);
 
 const VERIFY_DESCRIPTION =

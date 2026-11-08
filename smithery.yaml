@@ -20,7 +20,7 @@ startCommand:
       agentsProfile:
         type: string
         default: "core"
-        description: "core (14 web, document and code-security tools), all, or comma-separated agent or package ids."
+        description: "core (11 web, document and code-review tools), all, or comma-separated agent or package ids."
       agentsPackages:
         type: string
         description: "Optional: all, or comma-separated package ids, to list their checks as individual tools."

@@ -38,12 +38,12 @@ describe("stdio server (dist/index.js)", () => {
 
       const { tools } = await client.listTools();
       const names = tools.map((t) => t.name).sort();
-      assert.deepEqual(names, ["lead_enrichment", "pricey", "verify_provenance"]);
-      const lead = tools.find((t) => t.name === "lead_enrichment")!;
+      assert.deepEqual(names, ["enrich_lead", "pricey", "verify_provenance"]);
+      const lead = tools.find((t) => t.name === "enrich_lead")!;
       assert.match(lead.description ?? "", /0\.500000 USDC/);
       assert.deepEqual(lead.inputSchema.required, ["q"]);
 
-      const paid = await client.callTool({ name: "lead_enrichment", arguments: { q: "acme" } });
+      const paid = await client.callTool({ name: "enrich_lead", arguments: { q: "acme" } });
       assert.notEqual(paid.isError, true);
       const text = (paid.content as { type: string; text: string }[])[0]!.text;
       assert.deepEqual(JSON.parse(text).data.echoed, { q: "acme" });
